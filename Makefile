@@ -12,8 +12,8 @@ vet:
 	@go vet ./...
 
 build:
-	@echo ">> building binaries"
-	@go build ./cmd/...
+	@echo ">> building binary"
+	@go build -o promeval ./cmd/...
 
 
 install-tools:
