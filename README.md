@@ -17,8 +17,7 @@ make build
 
 Hardest part:
 
-If you really want to run promeval on your local machine you need to "reproduce" setup you have on your Prometheus instance.
- to have proper results.
+If you really want to run promeval on your local machine you need to "reproduce" setup you have on your Prometheus instance to have proper results.
 
 For example for Kubernetes default SD config you need:
 * KUBERNETES_SERVICE_HOST env variable
@@ -34,6 +33,6 @@ Using prometheus config file:
 
 `./promeval <cmd> prometheus.yaml`
 
-Using prometheus config file (named with the key "prometheus.yaml" inside Kubernetes configmap:
+Using prometheus config file inside Kubernetes configmap (named with the key "prometheus.yaml"):
 
 `./promeval <cmd> configmap.yaml --configmap-item=prometheus.yaml`
