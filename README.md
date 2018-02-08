@@ -30,3 +30,10 @@ All of this depends on your Prometheus scraping configuration.
 
 ## Usage
 
+Using prometheus config file:
+
+`./promeval <cmd> prometheus.yaml`
+
+Using prometheus config file (named with the key "prometheus.yaml" inside Kubernetes configmap:
+
+`./promeval <cmd> configmap.yaml --configmap-item=prometheus.yaml`

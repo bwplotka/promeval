@@ -18,36 +18,48 @@ import (
 	"github.com/prometheus/prometheus/pkg/relabel"
 )
 
-// target is the smallest elemement. We keep the structure flat for a reason -> easier JSON manipulation.
-type target struct {
-	JobName string `json:"job_name"`
-	Source  string `json:"source"`
-
-	targetLabels
+type TargetLabels struct {
+	Before labels.Labels `json:"before",yaml:"before"`
+	After  labels.Labels `json:"after",yaml:"after"`
 }
 
-type targetLabels struct {
-	Before labels.Labels `json:"before"`
-	After  labels.Labels `json:"after"`
+// Target is the smallest elemement. We keep the structure flat for a reason -> easier JSON manipulation.
+type Target struct {
+	JobName string `json:"job_name",yaml:"job_name"`
+	Source  string `json:"source",yaml:"source"`
+
+	TargetLabels
 }
 
-func targets(ctx context.Context, p *printer, cfg *config.Config) (targets []target, err error) {
+type scrapeJobFilter func([]*config.ScrapeConfig) []*config.ScrapeConfig
+
+func nopJobFilter(jobs []*config.ScrapeConfig) []*config.ScrapeConfig {
+	return jobs
+}
+
+type sourceFilter func(map[string]*config.TargetGroup) map[string]*config.TargetGroup
+
+func nopSourceFilter (sources map[string]*config.TargetGroup) map[string]*config.TargetGroup{
+	return sources
+}
+
+func targets(ctx context.Context, p *printer, cfg *config.Config, jobFilter scrapeJobFilter, sourceFilter sourceFilter) (targets []Target, err error) {
 	dlog := p.DiscoveryLogger()
-	for _, scfg := range cfg.ScrapeConfigs {
+	for _, scfg := range jobFilter(cfg.ScrapeConfigs) {
 		tgroups := discoverGroups(ctx, dlog, scfg)
 
-		for _, g := range tgroups {
+		for _, g := range sourceFilter(tgroups) {
 			targetsLabels, err := targetsFromGroup(g, scfg)
 			if err != nil {
 				// Partial err?
-				return nil, errors.Wrap(err, "target from groups")
+				return nil, errors.Wrap(err, "Target from groups")
 			}
 
 			for _, t := range targetsLabels {
-				targets = append(targets, target{
+				targets = append(targets, Target{
 					JobName:      scfg.JobName,
 					Source:       g.Source,
-					targetLabels: t,
+					TargetLabels: t,
 				})
 			}
 		}
@@ -86,7 +98,7 @@ func discoverGroups(ctx context.Context, l log.Logger, scfg *config.ScrapeConfig
 			select {
 			case <-ctx.Done():
 			case initial, ok := <-updates:
-				// Handle the case that a target provider exits and closes the channel
+				// Handle the case that a Target provider exits and closes the channel
 				// before the context is done.
 				if !ok {
 					break
@@ -107,14 +119,14 @@ func discoverGroups(ctx context.Context, l log.Logger, scfg *config.ScrapeConfig
 		}(name, prov)
 	}
 
-	// We wait for a full initial set of target groups.
+	// We wait for a full initial set of Target groups.
 	wg.Wait()
 	cancelProviders()
 	return targetGroups
 }
 
-func targetsFromGroup(tg *config.TargetGroup, cfg *config.ScrapeConfig) ([]targetLabels, error) {
-	targets := make([]targetLabels, 0, len(tg.Targets))
+func targetsFromGroup(tg *config.TargetGroup, cfg *config.ScrapeConfig) ([]TargetLabels, error) {
+	targets := make([]TargetLabels, 0, len(tg.Targets))
 
 	for i, tlset := range tg.Targets {
 		lbls := make([]labels.Label, 0, len(tlset)+len(tg.Labels))
@@ -134,7 +146,7 @@ func targetsFromGroup(tg *config.TargetGroup, cfg *config.ScrapeConfig) ([]targe
 		if err != nil {
 			return nil, errors.Wrapf(err, "populate %d in group %s", i, tg)
 		}
-		t := targetLabels{Before: origLabels}
+		t := TargetLabels{Before: origLabels}
 		if lbls != nil {
 			t.After = lbls
 		}
@@ -145,9 +157,9 @@ func targetsFromGroup(tg *config.TargetGroup, cfg *config.ScrapeConfig) ([]targe
 
 // populateLabels builds a label set from the given label set and scrape configuration.
 // It returns a label set before relabeling was applied as the second return value.
-// Returns a nil label set if the target is dropped during relabeling.
+// Returns a nil label set if the Target is dropped during relabeling.
 func populateLabels(lset labels.Labels, cfg *config.ScrapeConfig) (res, orig labels.Labels, err error) {
-	// Copy labels into the labelset for the target if they are not set already.
+	// Copy labels into the labelset for the Target if they are not set already.
 	scrapeLabels := []labels.Label{
 		{Name: model.JobLabel, Value: cfg.JobName},
 		{Name: model.MetricsPathLabel, Value: cfg.MetricsPath},
@@ -170,7 +182,7 @@ func populateLabels(lset labels.Labels, cfg *config.ScrapeConfig) (res, orig lab
 	preRelabelLabels := lb.Labels()
 	lset = relabel.Process(preRelabelLabels, cfg.RelabelConfigs...)
 
-	// Check if the target was dropped.
+	// Check if the Target was dropped.
 	if lset == nil {
 		return nil, nil, nil
 	}
@@ -212,21 +224,21 @@ func populateLabels(lset labels.Labels, cfg *config.ScrapeConfig) (res, orig lab
 	}
 
 	// Meta labels are deleted after relabelling. Other internal labels propagate to
-	// the target which decides whether they will be part of their label set.
+	// the Target which decides whether they will be part of their label set.
 	for _, l := range lset {
 		if strings.HasPrefix(l.Name, model.MetaLabelPrefix) {
 			lb.Del(l.Name)
 		}
 	}
 
-	// Default the instance label to the target address.
+	// Default the instance label to the Target address.
 	if v := lset.Get(model.InstanceLabel); v == "" {
 		lb.Set(model.InstanceLabel, addr)
 	}
 
 	res = lb.Labels()
 	for _, l := range res {
-		// Check label values are valid, drop the target if not.
+		// Check label values are valid, drop the Target if not.
 		if !model.LabelValue(l.Value).IsValid() {
 			return nil, nil, fmt.Errorf("invalid label value for %q: %q", l.Name, l.Value)
 		}

@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -45,44 +44,6 @@ func newPrinter(w io.Writer, format string) (*printer, error) {
 				"marshal": func(v interface{}) string {
 					a, _ := json.Marshal(v)
 					return string(a)
-				},
-				"filter": func(arr []interface{}, fn string, arg1 string, arg2 string) []interface{} {
-					var resArr []interface{}
-					for _, a := range arr {
-						var b bytes.Buffer
-						tmpl, err := template.New("").Parse(arg1)
-						if err != nil {
-							fmt.Printf("error arg1 %v\n", err)
-							continue
-						}
-						err = tmpl.Execute(&b, a)
-						if err != nil {
-							fmt.Printf("error arg1 %v\n", err)
-							continue
-						}
-						exArg1 := b.String()
-
-						b.Reset()
-						tmpl, err = template.New("").Parse(arg2)
-						if err != nil {
-							fmt.Printf("error arg2 %v\n", err)
-							continue
-						}
-						err = tmpl.Execute(&b, a)
-						if err != nil {
-							fmt.Printf("error arg2 %v\n", err)
-							continue
-						}
-
-						exArg2 := b.String()
-
-						if fn == "eq" && exArg1 != exArg2 {
-							continue
-						}
-						resArr = append(resArr, a)
-
-					}
-					return resArr
 				},
 			}).
 			Parse(format)
