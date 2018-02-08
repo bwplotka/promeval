@@ -36,3 +36,6 @@ Using prometheus config file:
 Using prometheus config file inside Kubernetes configmap (named with the key "prometheus.yaml"):
 
 `./promeval <cmd> configmap.yaml --configmap-item=prometheus.yaml`
+
+For example:
+`./promeval targets prometheus.yaml -job=xxx` will print you labels for targets in the time of scrape (before relabel)

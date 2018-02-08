@@ -66,7 +66,7 @@ func main() {
 		}
 	}
 
-	relabelCmd := app.Command("relabel", "relabel given labels using scrape job's (both target and metric) relabel configs from given configuration file.")
+	relabelCmd := app.Command("relabel", "Relabel given labels using scrape job's (both target and metric) relabel configs from given configuration file.")
 	{
 		configFile := relabelCmd.Arg(
 			"config-file",
