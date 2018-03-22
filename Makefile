@@ -15,7 +15,6 @@ build:
 	@echo ">> building binary"
 	@go build -o promeval ./cmd/...
 
-
 install-tools:
 	@echo ">> fetching goimports"
 	@go get -u golang.org/x/tools/cmd/goimports

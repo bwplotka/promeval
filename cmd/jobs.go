@@ -105,6 +105,11 @@ func discoverGroups(ctx context.Context, l log.Logger, scfg *config.ScrapeConfig
 				}
 				// First set of all targets the provider knows.
 				for _, tgroup := range initial {
+					if tgroup == nil {
+						// No group.
+						fmt.Printf("Provider %s does not return any targets.\n", name)
+						continue
+					}
 					mtx.Lock()
 					targetGroups[name+"/"+tgroup.Source] = tgroup
 					mtx.Unlock()
