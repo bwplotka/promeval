@@ -5,8 +5,9 @@ attaching it to the Prometheus instance.
 
 ## Setup
 
-Set your `$GOPATH` and add to your `$GOPATH/bin` `$PATH`
-Get tool:
+- setup your `$GOPATH`
+- add `$GOPATH/bin` to your `$PATH`
+- get tool:
 
 ```
 go get github.com/Bplotka/promeval
@@ -17,7 +18,7 @@ make build
 
 Hardest part:
 
-If you really want to run promeval on your local machine you need to "reproduce" setup you have on your Prometheus instance to have proper results.
+If you want to run promeval on your local machine you need to "reproduce" setup you have on your Prometheus instance to have proper results.
 
 For example for Kubernetes default SD config you need:
 * KUBERNETES_SERVICE_HOST env variable
