@@ -44,38 +44,39 @@ will evaluate given prometheus config and print labels that will be used for Kub
 pod running in default namespace called "service". E.g:
 
 ```
-"job_name": "kubernetes-pods",
-		"source": "pod/default/service",
-		"before": {
-			"__address__": "...,
-			"__meta_kubernetes_namespace": "default",
-			"__meta_kubernetes_pod_annotation_kubernetes_io_created_by": "{\"kind\":\"SerializedReference\",\"apiVersion\":\"v1\",\"reference\":{\"kind\":\"StatefulSet\",\"namespace\":\"default\",\...",
-			"__meta_kubernetes_pod_annotation_pod_alpha_kubernetes_io_initialized": "true",
-			"__meta_kubernetes_pod_annotation_pod_beta_kubernetes_io_hostname": "...",
-			"__meta_kubernetes_pod_annotation_pod_beta_kubernetes_io_subdomain": "...",
-			"__meta_kubernetes_pod_annotation_prometheus_io_path": "/metrics",
-			"__meta_kubernetes_pod_annotation_prometheus_io_scheme": "http",
-			"__meta_kubernetes_pod_container_name": "service",
-			"__meta_kubernetes_pod_container_port_name": "http",
-			"__meta_kubernetes_pod_container_port_number": "...",
-			"__meta_kubernetes_pod_container_port_protocol": "TCP",
-			"__meta_kubernetes_pod_host_ip": "....",
-			"__meta_kubernetes_pod_ip": "...",
-			"__meta_kubernetes_pod_label_component": "service",
-			"__meta_kubernetes_pod_name": "...",
-			"__meta_kubernetes_pod_node_name": "....",
-			"__meta_kubernetes_pod_ready": "true",
-			"__metrics_path__": "/metrics",
-			"__scheme__": "http",
-			"job": "kubernetes-pods"
-		},
-		"after": {
-			"__address__": "....",
-			"__metrics_path__": "/metrics",
-			"__scheme__": "http",
-			<all resulted label from your relabel process>
-		}
+{
+	"job_name": "kubernetes-pods",
+	"source": "pod/default/service",
+	"before": {
+		"__address__": "...,
+		"__meta_kubernetes_namespace": "default",
+		"__meta_kubernetes_pod_annotation_kubernetes_io_created_by": "{\"kind\":\"SerializedReference\",\"apiVersion\":\"v1\",\"reference\":{\"kind\":\"StatefulSet\",\"namespace\":\"default\",\...",
+		"__meta_kubernetes_pod_annotation_pod_alpha_kubernetes_io_initialized": "true",
+		"__meta_kubernetes_pod_annotation_pod_beta_kubernetes_io_hostname": "...",
+		"__meta_kubernetes_pod_annotation_pod_beta_kubernetes_io_subdomain": "...",
+		"__meta_kubernetes_pod_annotation_prometheus_io_path": "/metrics",
+		"__meta_kubernetes_pod_annotation_prometheus_io_scheme": "http",
+		"__meta_kubernetes_pod_container_name": "service",
+		"__meta_kubernetes_pod_container_port_name": "http",
+		"__meta_kubernetes_pod_container_port_number": "...",
+		"__meta_kubernetes_pod_container_port_protocol": "TCP",
+		"__meta_kubernetes_pod_host_ip": "....",
+		"__meta_kubernetes_pod_ip": "...",
+		"__meta_kubernetes_pod_label_component": "service",
+		"__meta_kubernetes_pod_name": "...",
+		"__meta_kubernetes_pod_node_name": "....",
+		"__meta_kubernetes_pod_ready": "true",
+		"__metrics_path__": "/metrics",
+		"__scheme__": "http",
+		"job": "kubernetes-pods"
 	},
+	"after": {
+		"__address__": "....",
+		"__metrics_path__": "/metrics",
+		"__scheme__": "http",
+		<all resulted label from your relabel process>
+	}
+},
 ```
 
 NOTE: It is useful to actually print all before narrowing that to job and source to know exact name for `source` (: It is not straightforward and depends on your job.
