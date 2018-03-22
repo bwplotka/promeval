@@ -34,7 +34,7 @@ Tool should print properly what is missing in case of missing configuration agai
 
 ### Targets
 
-"targets" command allows you to print add discovered jobs after and before relabel.
+`targets` command allows you to print all discovered jobs after and before relabel.
 You can use `--job` and `--source` flags that print only certain sources/jobs.
 
 For example:
