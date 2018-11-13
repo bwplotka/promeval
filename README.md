@@ -1,5 +1,7 @@
 # promeval
 
+NOTE: This started for good reasons, but `promtool` catches pretty quickly on tooling, checks and linters.
+
 `promeval` is a small CLI tool that allows to test your scrape configuration before
 attaching it to the Prometheus instance.
 
